@@ -1,0 +1,164 @@
+openapi: 3.0.3
+info:
+  title: CSV File Upload API
+  description: API to upload CSV files
+  version: 1.0.0
+
+paths:
+  /csv/upload:
+    post:
+      summary: Upload a CSV file
+      description: Upload a CSV file to the server.
+      operationId: uploadCsvFile
+      tags:
+        - CSV
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/CSV"
+            encoding:
+              file:
+                contentType: text/csv
+        required: true
+      responses:
+        '200':
+          description: Successfully uploaded the file
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /csv-lines:
+    get:
+      summary: Fetch all CSV lines
+      operationId: fetchCsvLines
+      tags:
+        - CSV Lines
+      responses:
+        '200':
+          description: Fetched all CSV lines
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CsvLine"
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete all CSV lines
+      operationId: deleteCsvLines
+      tags:
+        - CSV Lines
+      responses:
+        '204':
+          description: No content
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /csv-lines/{code}:
+    get:
+      summary: Fetch CSV line
+      operationId: fetchCsvLine
+      tags:
+        - CSV Lines
+      parameters:
+        - $ref: "#/components/parameters/codePathParam"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CsvLine"
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  parameters:
+    codePathParam:
+      name: code
+      in: path
+      description: The unique code of the CSV line
+      required: true
+      schema:
+        type: string
+  schemas:
+    CSV:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+          description: The CSV file to upload
+    CsvLine:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Unique identifier for the CSV Line
+          example: "C001"
+        source:
+          type: string
+          description: Source of the data
+          example: "API"
+        codeListCode:
+          type: string
+          description: Code list identifier
+          example: "List01"
+        displayValue:
+          type: string
+          description: Display value of the CSV line
+          example: "Sample Value"
+        longDescription:
+          type: string
+          description: Detailed description of the CSV line
+          example: "This is a longer description of the CSV line."
+        fromDate:
+          type: string
+          format: date
+          description: Start date for the validity of this CSV line
+          example: "2019-01-01"
+        toDate:
+          type: string
+          format: date
+          description: End date for the validity of this CSV line
+          example: "2024-01-01"
+        sortingPriority:
+          type: integer
+          description: Priority level for sorting CSV lines
+          example: 1
+      required:
+        - code
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string

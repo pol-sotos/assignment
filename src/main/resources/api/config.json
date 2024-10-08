@@ -1,0 +1,16 @@
+{
+  "library": "spring-boot",
+  "dateLibrary": "java8",
+  "hideGenerationTimestamp": true,
+  "modelPackage": "com.assignment.api.model",
+  "apiPackage": "com.assignment.api",
+  "serializableModel": true,
+  "openApiNullable": false,
+  "useTags": true,
+  "unhandledException": true,
+  "useSpringBoot3": true,
+  "useSwaggerUI": true,
+  "interfaceOnly": true,
+  "skipDefaultInterface": true,
+  "generateBuilders": true
+}

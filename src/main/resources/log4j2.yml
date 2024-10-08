@@ -1,0 +1,22 @@
+Configuration:
+  status: info
+
+  Appenders:
+    Console:
+      - name: Console
+        PatternLayout:
+          pattern: "%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1} - %m%n"
+
+  Loggers:
+    Root:
+      level: INFO
+      AppenderRef:
+        - ref: Console  # Use AppenderRefs to refer to the Console appender
+
+    Logger:
+      - name: com.assignment.csv
+        level: INFO
+        additivity: false
+        AppenderRef:
+          - ref: Console
+

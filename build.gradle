@@ -1,0 +1,85 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.4'
+    id 'io.spring.dependency-management' version '1.1.4'
+    id "io.freefair.lombok" version "8.4"
+    id 'org.hidetake.swagger.generator' version '2.19.2'
+}
+
+group = 'com'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '17'
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+processResources {
+    dependsOn(generateSwaggerCode)
+}
+
+
+swaggerSources {
+    api {
+        inputFile = file("${rootDir}/src/main/resources/api/api.yaml")
+        code {
+            language = 'spring'
+
+            configFile = file("${rootDir}/src/main/resources/api/config.json")
+            components = [skipFormModel: false]
+            dependsOn validation
+        }
+    }
+}
+
+compileJava.dependsOn swaggerSources.api.code
+sourceSets.main.java.srcDir "${swaggerSources.api.code.outputDir}/src/main/java"
+sourceSets.main.resources.srcDir "${swaggerSources.api.code.outputDir}/src/main/resources"
+
+
+configurations.all {
+    exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+}
+
+dependencies {
+    implementation('org.springframework.boot:spring-boot-starter')
+    implementation('org.springframework.boot:spring-boot-starter-web')
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // In memory database
+    runtimeOnly 'com.h2database:h2'
+
+    // open api code generation && open api ui
+    swaggerCodegen 'org.openapitools:openapi-generator-cli:7.9.0'
+    implementation 'io.swagger.core.v3:swagger-annotations:2.2.20'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
+    // Metrics
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+
+    //logging
+    implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+
+    //CSV parser
+    implementation 'org.apache.commons:commons-csv:1.10.0'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.mockito:mockito-junit-jupiter'
+    testImplementation 'org.hamcrest:hamcrest-library'
+
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
